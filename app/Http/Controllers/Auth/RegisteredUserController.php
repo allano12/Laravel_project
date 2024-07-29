@@ -11,9 +11,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Illuminate\View\View;
-use PhpParser\Node\Stmt\TryCatch;
-
-use App\Http\Controllers\Auth\DB;
 
 class RegisteredUserController extends Controller
 {
@@ -38,23 +35,16 @@ class RegisteredUserController extends Controller
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
         ]);
 
-        try {
-            $user = User::create([
-                'name' => $request->name,
-                'email' => $request->email,
-                'password' => Hash::make($request->password),
-            ]);
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+        ]);
 
-            event(new Registered($user));
+        event(new Registered($user));
 
-            Auth::login($user);
+        Auth::login($user);
 
-            DB::Commit();
-
-            return redirect(route('dashboard', absolute: false));
-        } catch (\Exception $e) {
-
-            DB::rollBack();
-        }
+        return redirect(route('dashboard', absolute: false));
     }
 }

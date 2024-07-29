@@ -9,8 +9,6 @@ use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 use Illuminate\Validation\ValidationException;
 
-use App\Models\User;
-
 class LoginRequest extends FormRequest
 {
     /**
@@ -42,22 +40,6 @@ class LoginRequest extends FormRequest
     public function authenticate(): void
     {
         $this->ensureIsNotRateLimited();
-
-        // $isUserDeactivate = User::withTrashed()
-        //     ->whereEmail($this)->string('email');
-
-        //*
-        $user = User::withTrashed()
-            ->whereEmail($this->string('email'))
-            ->first();
-
-        // if ($user) {
-        //     $user->restore();
-        //     //$user->deleted_at = null;
-        //     //$user->save();
-        // }
-
-
 
         if (!Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
             RateLimiter::hit($this->throttleKey());
